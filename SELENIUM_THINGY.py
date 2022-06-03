@@ -1,7 +1,12 @@
 import time
 import os
 import re
+import pyperclip
 import pynput
+import codecs
+import traceback
+import sys
+import pyautogui
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -13,9 +18,14 @@ from inspect import currentframe, getframeinfo
 from getpass import getpass
 from datetime import datetime
 from datetime import date
-import tkinter as tk
-from tkinter import filedialog as fd
+from selenium.webdriver.common.keys import Keys
+import tk
+#from tk import tk
+#import tkinter as tk
+#from tk import filedialog as fd
 # REMEMBER TO ADD FUNCTIONALITY WHERE IF THERE'S A PERIOD AT THE START OF THE TITLE (E.G. ".38 SPECIAL"), IT REMOVES IT
+
+
 
 keyboard = Controller()
 
@@ -79,7 +89,8 @@ while True:
 		login = driver.find_element_by_id("username")
 		login.send_keys(str(LOGIN_EMAIL))
 		login.send_keys(Keys.RETURN)
-	except:
+	except Exception as e:
+		print(e)
 		time.sleep(0.5)
 	else:
 		break
@@ -89,14 +100,16 @@ while True:
 		login = driver.find_element_by_id("password")
 		login.send_keys(str(LOGIN_PW))
 		login.send_keys(Keys.RETURN)
-	except:
+	except Exception as e:
 		time.sleep(0.5)
+		print(e)
+		print('Line ~100')
 	else:
 		break
 
 
 
-songs = open(str(song_file))
+songs = codecs.open(str(song_file))
 
 now = datetime.now()
 today = date.today()
@@ -152,9 +165,11 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			#At this point, we have all the necessary variables for the video, so start inputting them into Odysee.
 			while True:# Input URL
 				try:
-					URL_Field = driver.find_element_by_id("content_name")
+					URL_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-group/fieldset-section[2]/input")
 					URL_Field.send_keys(URL_PART_2) #this is the part of the URL used in a URL search, present so such a search will return the vid being uploaded.
-				except:
+				except Exception as e:
+					print(e)
+					print('Line ~165')
 					time.sleep(1.0)
 				else:
 					break
@@ -163,8 +178,10 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			while Loop_Toggle == 0:# Get THE TITLE IN THE TITLE FIELD
 				try:
-					Title_Field = driver.find_element_by_id('content_title')
-				except:
+					Title_Field = driver.find_element_by_xpath('/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-section[2]/input')
+				except Exception as e:
+					print(e)
+					print('Line - 177')
 					time.sleep(1.0)
 				else:
 					Loop_Toggle = 1
@@ -174,8 +191,11 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			Title_Field.send_keys(Keys.SPACE)
 			Title_Field.send_keys(Keys.BACKSPACE)
 			keyboard = Controller()
-			keyboard.type(str(title))
-
+			pyperclip.copy(title)
+			keyboard.press(Key.ctrl)
+			keyboard.press("v")
+			keyboard.release(Key.ctrl)
+			keyboard.release("v")
 		# CONVERT TITLE TO WHAT THE FILE WILL BE CALLED SO WE CAN SEARCH.
 			# We already got rid of instances of 6 white space created as an artifact from saving the playlist as .txt.
 			# I tested this: Youtube won't let you have a title with more than 1 whitespace in a row, so that won't be a problem.
@@ -226,15 +246,31 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 
 		# OPEN THE FILES FOR THE VIDEOOOOOOOOOOOOOOOO
+#			while True:
+#				try:
+#					upload = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/section[1]/div/div[2]/fieldset-section[2]/input-submit/button/span/span")
+#					upload.send_Keys(str(STUFF)+"/"+str(video_filename))
+#				except Exception as e:
+#					time.sleep(1.0)
+#					print(e)
+#					print("Line ~247")
+#				else:
+#					break
+#			Loop_Toggle = 0
+
 			while True:
 				try:
-					upload = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/section[1]/div/div[2]/fieldset-section[2]/input-submit/button/span/span")
+					upload = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-section[1]/input-submit/button/span/span")
 					upload.click()
-				except:
+				except Exception as e:
 					time.sleep(1.0)
+					print(e)
+					print("Line ~247")
 				else:
 					break
 			Loop_Toggle = 0
+
+
 			#while True:
 		#		try:
 		#	print(str(STUFF)+str(video_filename))
@@ -247,14 +283,17 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			time.sleep(2)
 			keyboard = Controller()
-			keyboard.press(Key.ctrl)
-			keyboard.press('l')
-			keyboard.release('l')
+			keyboard.press(Key.ctrl)# - this is from when I was trying to type it with sendkeys. Hopefully unnecessary.
+			keyboard.press('l')     # - Okay, once I figure out how to interact with Odysee's file menu directly, this will
+			keyboard.release('l')   # - become unnecessary. However, currently I am focused on ensuring Kanji accuracy.
 			keyboard.release(Key.ctrl)
 			time.sleep(0.5)
 			print(str(STUFF)+str(video_filename))
-			keyboard.type(str(STUFF)+str(video_filename))
-			time.sleep(0.5)
+			pyperclip.copy(str(STUFF)+"/"+str(video_filename))
+			keyboard.press(Key.ctrl)
+			keyboard.press("v")
+			keyboard.release(Key.ctrl)
+			keyboard.release("v")
 			time.sleep(1)
 			keyboard.press(Key.enter)
 			keyboard.release(Key.enter)
@@ -266,25 +305,39 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			#		try:
 			while True:
 				try:
-					Description_Field = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[1]/div/div/fieldset-section/div[2]/div/div/textarea[1]")
-				except:
-					time.sleep(1.0) #I think what's happening here is Description_Field exists without being interactable. So it passes to the else
-				else:
-					break
-			while True:
-				try:
+					Description_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[2]/div/div/fieldset-section/div/div/div/textarea[1]")
 					Description_Field.send_keys("This was uploaded by an AI. Original URL was/is: ")
-				except:
-					#keyboard.press(Key.enter)
-					#keyboard.release(Key.enter)
-					print('delaying for some reason')
-					time.sleep(1.0)
+				except Exception as e:
+					time.sleep(1.0) #I think what's happening here is Description_Field exists without being interactable. So it passes to the else
+					print(e)
+					print("Line ~286")
 				else:
-					break
+   					break
+#			while True:
+#				try:
+#					
+####				except Exception as e:
+#					#keyboard.press(Key.enter)
+#					#keyboard.release(Key.enter)
+#					print(e)
+#					print("Line ~299")
+#					print('delaying for some reason')
+#					time.sleep(1.0)
+#				else:
+#					break
 			while True:
 				try:
-					keyboard.type(str(Original_URL) + "\n\n Original uploader name was/is: " + str(Channel_Name) + "\n\nOriginal uploader's channel's URL was/is: " + str(Channel_URL) + "\n\n Original, title, and thumbnail have been typed and uploaded here. Original description was/is:\n")
-				except:
+					Description_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[2]/div/div/fieldset-section/div/div/div/textarea[1]")
+					Description_Field.send_keys(str(Original_URL) + "\n\n Original uploader name was/is: ")
+					pyperclip.copy(Channel_Name)
+					keyboard.press(Key.ctrl)
+					keyboard.press("v")
+					keyboard.release(Key.ctrl)
+					keyboard.release("v")
+					Description_Field.send_keys("\n\nOriginal uploader's channel's URL was/is: " + str(Channel_URL) + "\n\n Original, title, and thumbnail have been typed and uploaded here. Original description was/is:\n")
+				except Exception as e:
+					print(e)
+					print("Line ~307")
 					print('delaying for some reason')
 					time.sleep(1.0)    #and then fails it. Solution: Simply have the else *as* the try and loop until it goes through. Do that tomorrow.
 				else:
@@ -292,16 +345,25 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			Loop_Toggle = 0
 
 			video_filename = video_filename.partition(".mp4")[0]
-			current_file = open("/home/wind/TEST/STUFF/"+str(video_filename)+".description", "r")
+			current_file = codecs.open(STUFF+"/"+str(video_filename)+".description", "r")
 			print(str(current_file))
 			for line in current_file:
 				while True:
 					try:
+						Description_Field.send_keys(Keys.RETURN)
+						Description_Field.send_keys(Keys.BACKSPACE)
 						Description_Field = driver.find_element_by_id("content_description") #OKAY HERE'S THE DEAL. For this, and
-						Description_Field.send_keys(str(line))								 #basically everything, we're going to
+						#line_unicode = line(i.decode("ascii", "replace"))
+						pyperclip.copy(str(line))
+						keyboard.press(Key.ctrl)
+						keyboard.press("v")
+						keyboard.release(Key.ctrl)
+						keyboard.release("v")								 #basically everything, we're going to
 						Description_Field.send_keys(Keys.RETURN)							 #have to start with a search to determine
-					except:																	 #if we have any weird characters. If we do
-						print('Description_Field not interactable, delaying')				 #then we have to print each one with \u or
+					except Exception as e:																	 #if we have any weird characters. If we do
+						print(e)
+						print("Line ~352")
+						print('delaying and trying again')				 #then we have to print each one with \u or
 						time.sleep(1.0)														 #the equivalent keyboard hotkeys.
 					else:
 						break
@@ -322,14 +384,17 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			while True:
 				try:
-					Upload_Thumnail = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[2]/div/div/div/div[2]/fieldset-section/input-submit/button/span/span")
-				except:
+					Upload_Thumnail = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/div[2]/section[1]/div/div/div/div[2]/fieldset-section/input-submit/button/span/span")
+				except Exception as e:
 					print("can't find thumbnail upload. Trying something else.")
+					print(e)
 					try:
 						Thumbnail_Upload_Tool = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[2]/div/div/div/div[2]/div/button/span/span")
 						time.sleep(0.5)
 						Thumbnail_Upload_Tool.click()
-					except:
+					except Exception as e:
+						print(e)
+						print("Line ~384")
 						print("okay something's seriously wrong here")
 						time.sleep(1.0)
 					else:
@@ -337,7 +402,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 				else:
 					try:
 						Upload_Thumnail.click()
-					except:
+					except Exception as e:
+						print(e)
+						print("Line ~394")
 						time.sleep(1.0)
 					else:
 						break
@@ -378,7 +445,11 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			keyboard.press('l')
 			keyboard.release('l')
 			keyboard.release(Key.ctrl)
-			keyboard.type(str(STUFF)+str(video_filename))
+			pyperclip.copy(str(STUFF)+"/"+str(video_filename))
+			keyboard.press(Key.ctrl)
+			keyboard.press("v")
+			keyboard.release(Key.ctrl)
+			keyboard.release("v")
 			print(str(STUFF)+str(video_filename))
 			time.sleep(1)
 			keyboard.press(Key.enter)
@@ -391,8 +462,10 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 				try:
 					Yes_Im_Sure = driver.find_element_by_xpath('/html/body/div[4]/div/div/div/button[1]/span/span')
 					Yes_Im_Sure.click()
-				except:
+				except Exception as e:
 					print('trying again')
+					print(e)
+					print("Line ~424")
 					time.sleep(1.0)
 				else:
 					break
@@ -410,34 +483,38 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 
 		#Input Deposit
-			while True:
-				try:
-					Deposit = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[4]/div/div/fieldset-section/input")
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys(Keys.BACKSPACE)
-					Deposit.send_keys("0.0001")
-				#		print(str(Song_Number))
-					time.sleep(0.5)
-				except:
-					time.sleep(1.0)
-				else:
-					break
+		#	while True:
+		#		try:
+		#			Deposit = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[4]/div/div/fieldset-section/input")
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys(Keys.BACKSPACE)
+		#			Deposit.send_keys("0.0001")
+		#		#		print(str(Song_Number))
+		#			time.sleep(0.5)
+		#		except Exception as e:
+		#			time.sleep(1.0)
+		#			print(e)
+		#			print("Line ~489")
+		#		else:
+		#			break
 			#Finalize the upload
 			while True:
 				try:
 					print("Searching for upload button...")
-					Upload_Button = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/section[2]/div/button[1]/span/span")
-				except:
+					Upload_Button = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[3]/div/button[1]/span/span")
+				except Exception as e:
 					print("Upload button not found. Sleeping and trying again...")
+					print(e)
+					print("Line ~517")
 					time.sleep(1.0)
 				else:
 					print("Upload button found. Ending search loop.")
@@ -446,7 +523,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 				try:
 					print("Attempting to click upload button...")
 					Upload_Button.click()
-				except:
+				except Exception as e:
+					print(e)
+					print("Line ~484")
 					print("Upload button unclickable. Sleeping and trying again...")
 					time.sleep(1.0)
 				else:
@@ -458,7 +537,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			while Loop_Toggle == 0:
 				try:
 					Upload_Button2 = driver.find_element_by_xpath("/html/body/div[4]/div/div/form/section/div/div[3]/div[1]/button[1]/span/span")
-				except:
+				except Exception as e:
+					print(e)
+					print("Line ~498")
 					time.sleep(1.0)
 				else:
 					Loop_Toggle = 1
@@ -466,7 +547,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			while Loop_Toggle == 0:
 				try:
 					Upload_Button2.click()
-				except:
+				except Exception as e:
+					print(e)
+					print("Line ~508")
 					time.sleep(1.0)
 				else:
 					Loop_Toggle = 1
@@ -476,7 +559,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			while True:
 				try:
 					driver.find_element_by_xpath("/html/body/div[4]/div/div/section/div/div[3]/div/button[1]/span/span")
-				except:
+				except Exception as e:
+					print(e)
+					print("Line ~520")
 					time.sleep(1.0)
 				else:
 					Loop_Toggle = 1
