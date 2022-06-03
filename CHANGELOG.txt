@@ -1,0 +1,9 @@
+Most recent patch - 06/03/2022
+
+Fixed an issue where sometimes Japanese (and presumably a bunch of foreign) characters would just get inputted wrong, causing crashes, and worse, 
+inaccuracies in the title and description.
+
+I am fully aware of Windows not liking the colon or whatever it was in the log file and will fix or create a Windows version when I get the chance.
+
+Also on the agenda is to make a headless version and create an installer so you guys don't have to try to sift through error messages to install 
+all the packages.
