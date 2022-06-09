@@ -169,7 +169,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					URL_Field.send_keys(URL_PART_2) #this is the part of the URL used in a URL search, present so such a search will return the vid being uploaded.
 				except Exception as e:
 					print(e)
-					print('Line ~165')
+					print('Line ~172')
 					time.sleep(1.0)
 				else:
 					break
@@ -205,25 +205,19 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 
 			video_filename = str(title)
-			Loop_Toggle = 1
 			print(str(video_filename[len(video_filename)-1]))
 			print(title)
 			print(video_filename)
 			while True:
-				for file in os.listdir(str(STUFF)):
-					if str(video_filename) in file and str(".mp4") in file and str(".mp4_") not in file and str(".jpg") not in file:
-						print("Found it!")
-						video_filename = str(file)
-						Loop_Toggle = 0
-				if Loop_Toggle == 1:
+				if "*" or "|" or ":" or ":" or "?" or "__" in video_filename:
 					print("Modifying filename as variant of title")
 					video_filename = video_filename.replace('/', '_')
 					video_filename = video_filename.replace("\n", "")
 					if video_filename[len(video_filename)-1] == "*" or video_filename[len(video_filename)-1] == str("|"):
 						print("Yes, final character is asterisk")
 						video_filename = video_filename[0:(len(video_filename)-1)]#This while loop is because if the final character is a | or a *
-					#	print(str(video_filename))			                      #Then instead of replacing it, youtube-dl removes it in the naming
-		                                                                         #process instead of replacing it with an underscore or different 
+				#	print(str(video_filename))			                      #Then instead of replacing it, youtube-dl removes it in the naming
+	                                                                         #process instead of replacing it with an underscore or different 
 					if video_filename[0] == str('-'):                                             #character. A while loop is safer than if.
 						video_filename = ("_" + video_filename.partition("-")[2]) 
 
@@ -233,30 +227,27 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					video_filename = video_filename.replace("|", "_") # I don't have a clue why it would do this since they're both
 					video_filename = video_filename.replace(": ", " - ")# allowed characters, but ah well.
 					video_filename = video_filename.replace(":", "_")
-					video_filename = video_filename.replace('"', "'")
+					video_filename = video_filename.replace(":", "'")
 					video_filename = video_filename.replace("?", "")
 					video_filename = video_filename.replace("__", "_")
 					print('String is:')
 					print(str(video_filename))
-					#print(video_filename)
 				else:
 					break
+				for file in os.listdir(str(STUFF)):
+					if str(video_filename) in file and str(".mp4") in file and str(".mp4_") not in file and str(".jpg") not in file:
+						print("Found it!")
+						video_filename = str(file)
+						break
+#						Loop_Toggle = 0
+#				if Loop_Toggle == 1:
+					#print(video_filename)
+#					else:
+				break
 
-			Loop_Toggle = 1
+#			Loop_Toggle = 1
 
 
-		# OPEN THE FILES FOR THE VIDEOOOOOOOOOOOOOOOO
-#			while True:
-#				try:
-#					upload = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/section[1]/div/div[2]/fieldset-section[2]/input-submit/button/span/span")
-#					upload.send_Keys(str(STUFF)+"/"+str(video_filename))
-#				except Exception as e:
-#					time.sleep(1.0)
-#					print(e)
-#					print("Line ~247")
-#				else:
-#					break
-#			Loop_Toggle = 0
 
 			while True:
 				try:
@@ -271,33 +262,24 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			Loop_Toggle = 0
 
 
-			#while True:
-		#		try:
-		#	print(str(STUFF)+str(video_filename))
-	#		def test_visible_upload(self):
-	#			self.choose_file(driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/section[1]/div/div[2]/fieldset-section[2]/input-submit/button/span/span"), str(STUFF)+str(video_filename))
-	#		except:
-	#		else:
-	#			break
-
-
 			time.sleep(2)
 			keyboard = Controller()
 			keyboard.press(Key.ctrl)# - this is from when I was trying to type it with sendkeys. Hopefully unnecessary.
 			keyboard.press('l')     # - Okay, once I figure out how to interact with Odysee's file menu directly, this will
 			keyboard.release('l')   # - become unnecessary. However, currently I am focused on ensuring Kanji accuracy.
 			keyboard.release(Key.ctrl)
-			time.sleep(0.5)
-			print(str(STUFF)+str(video_filename))
+			time.sleep(2)
+			print(str(STUFF)+ "/" + str(video_filename))
 			pyperclip.copy(str(STUFF)+"/"+str(video_filename))
+			time.sleep(0.5)
 			keyboard.press(Key.ctrl)
 			keyboard.press("v")
 			keyboard.release(Key.ctrl)
 			keyboard.release("v")
-			time.sleep(1)
+			time.sleep(2)
 			keyboard.press(Key.enter)
 			keyboard.release(Key.enter)
-			time.sleep(0.5)
+			time.sleep(2)
 			#FIND DESCRIPTION AND CHECK THAT OUT
 
 			print('typing description')
@@ -308,28 +290,19 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					Description_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[2]/div/div/fieldset-section/div/div/div/textarea[1]")
 					Description_Field.send_keys("This was uploaded by an AI. Original URL was/is: ")
 				except Exception as e:
+					keyboard.press(Key.enter)
+					keyboard.release(Key.enter)
 					time.sleep(1.0) #I think what's happening here is Description_Field exists without being interactable. So it passes to the else
 					print(e)
-					print("Line ~286")
+					print("Line ~293")
 				else:
    					break
-#			while True:
-#				try:
-#					
-####				except Exception as e:
-#					#keyboard.press(Key.enter)
-#					#keyboard.release(Key.enter)
-#					print(e)
-#					print("Line ~299")
-#					print('delaying for some reason')
-#					time.sleep(1.0)
-#				else:
-#					break
 			while True:
 				try:
 					Description_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[2]/div/div/fieldset-section/div/div/div/textarea[1]")
 					Description_Field.send_keys(str(Original_URL) + "\n\n Original uploader name was/is: ")
 					pyperclip.copy(Channel_Name)
+					time.sleep(0.5)
 					keyboard.press(Key.ctrl)
 					keyboard.press("v")
 					keyboard.release(Key.ctrl)
@@ -352,8 +325,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					try:
 						Description_Field.send_keys(Keys.RETURN)
 						Description_Field.send_keys(Keys.BACKSPACE)
-						Description_Field = driver.find_element_by_id("content_description") #OKAY HERE'S THE DEAL. For this, and
-						#line_unicode = line(i.decode("ascii", "replace"))
+						Description_Field = driver.find_element_by_id("content_description") 
 						pyperclip.copy(str(line))
 						keyboard.press(Key.ctrl)
 						keyboard.press("v")
@@ -368,8 +340,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					else:
 						break
 			Description_Field.send_keys(Keys.BACKSPACE)
-			Loop_Toggle = 0
-
+			time.sleep(2)
 
 			#UPLOAD THUMBNAIL
 			also_path = "file:///home/wind/TEST/STUFF/"
@@ -390,11 +361,11 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					print(e)
 					try:
 						Thumbnail_Upload_Tool = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[2]/div/div/div/div[2]/div/button/span/span")
-						time.sleep(0.5)
+						time.sleep(1)
 						Thumbnail_Upload_Tool.click()
 					except Exception as e:
 						print(e)
-						print("Line ~384")
+						print("Line ~399")
 						print("okay something's seriously wrong here")
 						time.sleep(1.0)
 					else:
@@ -404,48 +375,18 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 						Upload_Thumnail.click()
 					except Exception as e:
 						print(e)
-						print("Line ~394")
+						print("Line ~409")
 						time.sleep(1.0)
 					else:
 						break
-			time.sleep(1)								
-		#	while Loop_Toggle == 0:
-		#		try:
-		#			thumbnail = driver.find_element_by_xpath('/html/body/div[4]/div/div/div/button[1]/span/span')
-		#			print("Thumbnail affirmation loop is active. Attempting.")
-		#		except:
-		#			print("Thumbnail confirm button not found, entering sleep to try again.")
-		#			time.sleep(1.0)
-		#		else:
-		#			Loop_Toggle = 1
-		#			print("Confirm thumbnail button found, exiting search loop.")
-		#	Loop_Toggle = 0
-		#	thumbnail.click()
-		#		Number_of_Times_to_Scroll1 = 0
-		#		while Number_of_Times_to_Scroll1 < 7:
-		#			keyboard.press(Key.tab)
-		#			keyboard.release(Key.tab)
-		#			Number_of_Times_to_Scroll1 += 1
-		#		time.sleep(1)
-		#		keyboard.press(Key.enter)
-		#		keyboard.release(Key.enter)
+			time.sleep(2)
 
-
-		#		Number_of_Times_to_Scroll1 = 0
-		#		while Number_of_Times_to_Scroll1 < 2:
-		#			keyboard.press(Key.tab)
-		#			keyboard.release(Key.tab)
-		#			Number_of_Times_to_Scroll1 += 1
-		#		time.sleep(1)
-		#		keyboard.press(Key.enter)
-		#		keyboard.release(Key.enter)
-
-			time.sleep(0.5)
 			keyboard.press(Key.ctrl)
 			keyboard.press('l')
 			keyboard.release('l')
 			keyboard.release(Key.ctrl)
 			pyperclip.copy(str(STUFF)+"/"+str(video_filename))
+			time.sleep(0.5)
 			keyboard.press(Key.ctrl)
 			keyboard.press("v")
 			keyboard.release(Key.ctrl)
@@ -454,7 +395,9 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			time.sleep(1)
 			keyboard.press(Key.enter)
 			keyboard.release(Key.enter)
-
+			time.sleep(1)
+			keyboard.press(Key.enter)
+			keyboard.release(Key.enter)
 
 			time.sleep(1)
 			while True:
@@ -471,42 +414,6 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					break
 			
 
-		#		Number_of_Times_to_Scroll1 = 0
-		#		while Number_of_Times_to_Scroll1 < 1:
-		#			keyboard.press(Key.tab)
-		#			keyboard.release(Key.tab)
-		#			Number_of_Times_to_Scroll1 += 1
-		#		time.sleep(1)
-		#		keyboard.press(Key.enter)
-		#		keyboard.release(Key.enter)
-		#		time.sleep(0.5)
-
-
-		#Input Deposit
-		#	while True:
-		#		try:
-		#			Deposit = driver.find_element_by_xpath("/html/body/div/div/div/div/main/div/div[2]/section[4]/div/div/fieldset-section/input")
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys(Keys.BACKSPACE)
-		#			Deposit.send_keys("0.0001")
-		#		#		print(str(Song_Number))
-		#			time.sleep(0.5)
-		#		except Exception as e:
-		#			time.sleep(1.0)
-		#			print(e)
-		#			print("Line ~489")
-		#		else:
-		#			break
-			#Finalize the upload
 			while True:
 				try:
 					print("Searching for upload button...")
@@ -525,16 +432,15 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					Upload_Button.click()
 				except Exception as e:
 					print(e)
-					print("Line ~484")
+					print("Line ~430")
 					print("Upload button unclickable. Sleeping and trying again...")
 					time.sleep(1.0)
 				else:
 					print("Upload button clicked successfully. Ending attempt loop.")
 					break
-			Loop_Toggle = 0
-			time.sleep(1)
+					time.sleep(1)
 
-			while Loop_Toggle == 0:
+			while True:
 				try:
 					Upload_Button2 = driver.find_element_by_xpath("/html/body/div[4]/div/div/form/section/div/div[3]/div[1]/button[1]/span/span")
 				except Exception as e:
@@ -542,20 +448,17 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					print("Line ~498")
 					time.sleep(1.0)
 				else:
-					Loop_Toggle = 1
-			Loop_Toggle = 0
-			while Loop_Toggle == 0:
+					break
+			while True:
 				try:
 					Upload_Button2.click()
 				except Exception as e:
 					print(e)
-					print("Line ~508")
+					print("Line ~452")
 					time.sleep(1.0)
 				else:
-					Loop_Toggle = 1
-			Loop_Toggle = 0
-
-			
+					break
+		
 			while True:
 				try:
 					driver.find_element_by_xpath("/html/body/div[4]/div/div/section/div/div[3]/div/button[1]/span/span")
@@ -568,7 +471,6 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					print("okay we're at the end of the loop")
 					LOG_FILE.write('Video "'+str(title)+'" successfully uploaded! \n \n \n')
 					break
-			Loop_Toggle = 0
 		#Go to the uploads page so we know it's working (and to HOPEFULLY void the thing there the info for the last vid is still there)
 		#		Loop_Toggle = 1
 		#		while Loop_Toggle == 0:
