@@ -232,6 +232,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					video_filename = video_filename.replace(":", "'")
 					video_filename = video_filename.replace("?", "")
 					video_filename = video_filename.replace("__", "_")
+					video_filename = video_filename.replace('"', "'")					
 					print('String is:')
 					print(str(video_filename))
 				else:
