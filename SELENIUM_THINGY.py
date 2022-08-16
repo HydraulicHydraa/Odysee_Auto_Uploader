@@ -165,7 +165,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			#At this point, we have all the necessary variables for the video, so start inputting them into Odysee.
 			while True:# Input URL
 				try:
-					URL_Field = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-group/fieldset-section[2]/input")
+					URL_Field = driver.find_element_by_xpath("/html/body/div[1]/div/div[3]/div[2]/main/div/section[1]/div/div/div/fieldset-group/fieldset-section[2]/input")
 					URL_Field.send_keys(URL_PART_2) #this is the part of the URL used in a URL search, present so such a search will return the vid being uploaded.
 				except Exception as e:
 					print(e)
@@ -178,7 +178,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			while Loop_Toggle == 0:# Get THE TITLE IN THE TITLE FIELD
 				try:
-					Title_Field = driver.find_element_by_xpath('/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-section[2]/input')
+					Title_Field = driver.find_element_by_xpath('/html/body/div[1]/div/div[3]/div[2]/main/div/section[1]/div/div/div/div[1]/fieldset-section/input')
 				except Exception as e:
 					print(e)
 					print('Line - 177')
@@ -211,6 +211,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			while True:
 				if "*" or "|" or ":" or ":" or "?" or "__" in video_filename:
 					print("Modifying filename as variant of title")
+					video_filename = video_filename.replace("://", " -_")
 					video_filename = video_filename.replace('/', '_')
 					video_filename = video_filename.replace("\n", "")
 					if video_filename[len(video_filename)-1] == "*" or video_filename[len(video_filename)-1] == str("|"):
@@ -220,6 +221,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 	                                                                         #process instead of replacing it with an underscore or different 
 					if video_filename[0] == str('-'):                                             #character. A while loop is safer than if.
 						video_filename = ("_" + video_filename.partition("-")[2]) 
+
 
 					video_filename = video_filename.replace("**", "_")                    #I may find other characters that need a similar treatment.
 					video_filename = video_filename.replace("*", "_") #This part was really wierd. Apparantly it replaces asterisks
@@ -251,7 +253,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			while True:
 				try:
-					upload = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/section[1]/div/div[2]/div/fieldset-section[1]/input-submit/button/span/span")
+					upload = driver.find_element_by_xpath("/html/body/div[1]/div/div[3]/div[2]/main/div/section[1]/div/div/div/fieldset-section/input-submit/button/span/span")
 					upload.click()
 				except Exception as e:
 					time.sleep(1.0)
@@ -355,7 +357,7 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 
 			while True:
 				try:
-					Upload_Thumnail = driver.find_element_by_xpath("/html/body/div/div/div[3]/div[2]/main/div/div[2]/section[1]/div/div/div/div[2]/fieldset-section/input-submit/button/span/span")
+					Upload_Thumnail = driver.find_element_by_xpath("/html/body/div[1]/div/div[3]/div[2]/main/div/div/section[1]/div/div/div/div[2]/fieldset-section/input-submit/button/span/span")
 				except Exception as e:
 					print("can't find thumbnail upload. Trying something else.")
 					print(e)
@@ -399,11 +401,20 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 			keyboard.press(Key.enter)
 			keyboard.release(Key.enter)
 
+
+#			while True:
+#				try:
+#					Yes_Im_Sure_Upload = driver.find_element_by_xpath('/html/body/div[5]/div/div/div/button[1]/span/span')
+#					Yes_Im_Sure_Upload.click()
+#				except:
+#					print("Line ~410")
+#				else:
+#					break
 			time.sleep(1)
 			while True:
 				print('searching for Yes_Im_Sure')
 				try:
-					Yes_Im_Sure = driver.find_element_by_xpath('/html/body/div[4]/div/div/div/button[1]/span/span')
+					Yes_Im_Sure = driver.find_element_by_xpath('/html/body/div[6]/div/div/div/button[1]/span/span')
 					Yes_Im_Sure.click()
 				except Exception as e:
 					print('trying again')
@@ -422,6 +433,8 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					print("Upload button not found. Sleeping and trying again...")
 					print(e)
 					print("Line ~517")
+					keyboard.press(Key.end)
+					keyboard.release(Key.end)
 					time.sleep(1.0)
 				else:
 					print("Upload button found. Ending search loop.")
@@ -434,15 +447,19 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 					print(e)
 					print("Line ~430")
 					print("Upload button unclickable. Sleeping and trying again...")
+					keyboard.press(Key.end)
+					keyboard.release(Key.end) ##pressing the end key is so that if an ad has popped up and is in the way, we can skip past it.
 					time.sleep(1.0)
 				else:
 					print("Upload button clicked successfully. Ending attempt loop.")
 					break
 					time.sleep(1)
 
+			driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
 			while True:
 				try:
-					Upload_Button2 = driver.find_element_by_xpath("/html/body/div[4]/div/div/form/section/div/div[3]/div[1]/button[1]/span/span")
+					Upload_Button2 = driver.find_element_by_xpath("/html/body/div[6]/div/div/form/section/div/div[3]/div[1]/button[1]/span/span")
 				except Exception as e:
 					print(e)
 					print("Line ~498")
@@ -453,15 +470,16 @@ for line in songs:  # GET THE FILE CONTAINING ALL OUR SONG TITLES + URLS AND SET
 				try:
 					Upload_Button2.click()
 				except Exception as e:
+					keyboard.press(Key.end)
+					keyboard.release(Key.end)
 					print(e)
 					print("Line ~452")
-					time.sleep(1.0)
 				else:
 					break
 		
 			while True:
 				try:
-					driver.find_element_by_xpath("/html/body/div[4]/div/div/section/div/div[3]/div/button[1]/span/span")
+					driver.find_element_by_xpath("/html/body/div[6]/div/div/section/div/div[3]/div/button[1]/span/span")
 				except Exception as e:
 					print(e)
 					print("Line ~520")
