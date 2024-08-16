@@ -1,3 +1,6 @@
+THIS IS NOW OUTDATED. SEE 1.69 FOR THE PLAYWRIGHT REWRITE.
+
+
 Most recent patch - 06/03/2022
 
 Fixed an issue where sometimes Japanese (and presumably a bunch of foreign) characters would just get inputted wrong, causing crashes, and worse, 
